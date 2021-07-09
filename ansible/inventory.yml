@@ -1,0 +1,5 @@
+app:
+  hosts:
+    appserver:
+      ansible_host: <ip_address>
+    

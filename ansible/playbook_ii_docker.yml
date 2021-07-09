@@ -1,0 +1,82 @@
+---
+- name: docker install
+  hosts: app
+  gather_facts: no
+  become: yes
+  vars:
+  - dockerfile_folder: "container"
+  - docker_image_name: "devops_nginx"
+  - docker_container_name: "devops_web"
+  - user_service: "ubuntu"
+  - http_port: "80"
+  tasks:
+    - name: Copy sign for repo docker
+      copy:
+        src: files/docker-archive-keyring.gpg
+        dest: /usr/share/keyrings/docker-archive-keyring.gpg
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Add repo for docker
+      apt_repository:
+        repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu focal stable"
+        state: present
+        filename: docker
+
+    - name: Install Docker from repo    
+      apt:
+        name: "{{ item }}"
+        update_cache: yes
+        autoremove: yes
+      with_items:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - python3-pip
+          - python-is-python3
+    
+    - name: install docker python module
+      pip:
+        name: docker
+
+    - name: Start docker
+      systemd:
+        name: docker
+        state: started
+    
+    - name: Create dir for run container
+      file:
+        path: "~{{user_service}}/container"
+        state: directory
+        owner: "{{user_service}}"
+        group: "{{user_service}}"
+        mode: '0755'
+    
+    - name: Copy files for deploy container
+      copy: 
+        src: "{{ item }}"
+        dest: "~{{user_service}}/container"
+        owner: "{{user_service}}"
+        group: "{{user_service}}"
+        mode: '0755'
+      with_items:
+        - index.html
+        - Dockerfile
+    
+    - name: Build docker image from Dockerfile
+      docker_image:
+        name: "{{docker_image_name}}"
+        build:
+          pull: yes
+          path: "~{{user_service}}/{{dockerfile_folder}}"
+
+    - name: Launch docker container
+      docker_container:
+        name: "{{docker_container_name}}"
+        image: "{{docker_image_name}}"
+        state: started
+        ports:
+          - "{{http_port}}:80"
+      register: docker_info
+      
