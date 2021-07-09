@@ -9,7 +9,7 @@
 1. Для запуска проекта зайти в terraform/, запустить последовательно: terraform init, terraform plan, terraform apply
 2. Для получения публичного ip адреса выполнить: terraform show | grep public_ip
 3. Добавить в ansible/inventory.yml полученный ip адрес для запуска playbook
-4. Запустить выполнение: ansible_playbook -i ansible/inventory playbook_ii_docker.yml   
+4. Запустить выполнение: ansible_playbook -i ansible/inventory.yml playbook_ii_docker.yml   
 
 ## Результат:
 Необходимо подготовить код, который запускает веб сервер и доступна страница вида: <DevOps Course 2021>. Веб сервер должен быть запущен в инфраструктуре AWS в новой VPC. 
