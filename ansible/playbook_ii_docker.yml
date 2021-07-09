@@ -47,18 +47,18 @@
     
     - name: Create dir for run container
       file:
-        path: "~{{user_service}}/container"
+        path: "~{{ user_service }}/container"
         state: directory
-        owner: "{{user_service}}"
-        group: "{{user_service}}"
+        owner: "{{ user_service }}"
+        group: "{{ user_service }}"
         mode: '0755'
     
     - name: Copy files for deploy container
       copy: 
         src: "{{ item }}"
-        dest: "~{{user_service}}/container"
-        owner: "{{user_service}}"
-        group: "{{user_service}}"
+        dest: "~{{ user_service }}/container"
+        owner: "{{ user_service }}"
+        group: "{{ user_service }}"
         mode: '0755'
       with_items:
         - index.html
@@ -69,14 +69,14 @@
         name: "{{docker_image_name}}"
         build:
           pull: yes
-          path: "~{{user_service}}/{{dockerfile_folder}}"
+          path: "~{{ user_service }}/{{dockerfile_folder}}"
 
     - name: Launch docker container
       docker_container:
-        name: "{{docker_container_name}}"
-        image: "{{docker_image_name}}"
+        name: "{{ docker_container_name }}"
+        image: "{{ docker_image_name }}"
         state: started
         ports:
-          - "{{http_port}}:80"
+          - "{{ http_port }}:80"
       register: docker_info
       
